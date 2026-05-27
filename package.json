@@ -3,20 +3,54 @@
   "version": "0.1.0",
   "description": "Offline linter for agent instructions, system prompts, and repo guidance files.",
   "type": "module",
-  "main": "./src/index.js",
+  "main": "./dist/index.js",
+  "bin": {
+    "promptprobe": "./dist/cli.js"
+  },
   "exports": {
-    ".": "./src/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
   "files": [
-    "src",
+    "dist",
+    "examples",
     "README.md"
   ],
   "scripts": {
-    "test": "node --test",
+    "build": "tsc",
+    "check": "tsc --noEmit",
+    "pretest": "npm run build",
+    "test": "node --test dist/tests/**/*.test.js",
+    "smoke": "bash scripts/smoke.sh",
     "package:smoke": "npm pack --dry-run",
-    "release:check": "npm test && npm run package:smoke"
+    "release:check": "npm run check && npm test && npm run smoke && npm run package:smoke"
   },
-  "keywords": [],
+  "keywords": [
+    "agents",
+    "lint",
+    "prompt",
+    "prompt-engineering",
+    "cli",
+    "markdown",
+    "security"
+  ],
   "author": "Roger Chappel",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rogerchappel/promptprobe.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rogerchappel/promptprobe/issues"
+  },
+  "homepage": "https://github.com/rogerchappel/promptprobe#readme",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.3"
+  }
 }
