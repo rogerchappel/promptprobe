@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { writeFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { defaultConfig, loadConfig, writeDefaultConfig } from './config.js';
 import { formatRules, formatScanResult } from './formatters.js';
@@ -16,6 +17,11 @@ type Parsed = {
 async function main(argv: string[]): Promise<number> {
   const parsed = parse(argv);
   try {
+    if (parsed.command === 'version') {
+      process.stdout.write(`${packageVersion()}\n`);
+      return 0;
+    }
+
     if (parsed.command === 'init') {
       const destination = await writeDefaultConfig(process.cwd());
       process.stdout.write(`Created ${path.relative(process.cwd(), destination)}\n`);
@@ -80,7 +86,15 @@ function parse(argv: string[]): Parsed {
     }
   }
 
-  return { command: command === '--help' || command === '-h' ? 'help' : command, args, options };
+  return {
+    command: command === '--help' || command === '-h'
+      ? 'help'
+      : command === '--version' || command === '-v'
+        ? 'version'
+        : command,
+    args,
+    options
+  };
 }
 
 function stringOption(parsed: Parsed, name: string): string | undefined {
@@ -106,10 +120,16 @@ function usage(): string {
   promptprobe scan [files...] [--format text|json|markdown] [--output path] [--fail-on low|medium|high]
   promptprobe rules [--format text|json|markdown]
   promptprobe explain PP003
+  promptprobe version
 
 Default config:
 ${JSON.stringify(defaultConfig, null, 2)}
 `;
+}
+
+function packageVersion(): string {
+  const require = createRequire(import.meta.url);
+  return (require('../../package.json') as { version: string }).version;
 }
 
 process.exitCode = await main(process.argv.slice(2));
