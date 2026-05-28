@@ -28,4 +28,22 @@ describe('scan', () => {
     assert.deepEqual(result.files, ['docs/one.md', 'docs/two.md']);
     assert.equal(result.summary.findings, 0);
   });
+
+  it('fails fast when an explicit input file is missing', async () => {
+    const root = await mkdtemp(path.join(tmpdir(), 'promptprobe-'));
+
+    await assert.rejects(
+      scan({ cwd: root, inputs: ['AGNETS.md'] }),
+      /no files matched input: AGNETS\.md/
+    );
+  });
+
+  it('allows absent default config patterns', async () => {
+    const root = await mkdtemp(path.join(tmpdir(), 'promptprobe-'));
+
+    const result = await scan({ cwd: root, inputs: [] });
+
+    assert.deepEqual(result.files, []);
+    assert.equal(result.summary.findings, 0);
+  });
 });

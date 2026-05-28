@@ -3,7 +3,16 @@ import { access, readdir, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import type { ProbeDocument } from './types.js';
 
-export async function resolveInputFiles(cwd: string, patterns: string[], exclude: string[]): Promise<string[]> {
+type ResolveOptions = {
+  requireExplicitMatches?: boolean;
+};
+
+export async function resolveInputFiles(
+  cwd: string,
+  patterns: string[],
+  exclude: string[],
+  options: ResolveOptions = {}
+): Promise<string[]> {
   const candidates = new Set<string>();
   const allFiles = await listFiles(cwd);
   const excludeRegexes = exclude.map(globToRegExp);
@@ -11,9 +20,11 @@ export async function resolveInputFiles(cwd: string, patterns: string[], exclude
   for (const input of patterns) {
     const normalized = normalizePath(input);
     const absolute = path.resolve(cwd, input);
+    let matched = false;
 
     if (await isFile(absolute)) {
       candidates.add(normalizePath(path.relative(cwd, absolute)));
+      matched = true;
       continue;
     }
 
@@ -21,7 +32,12 @@ export async function resolveInputFiles(cwd: string, patterns: string[], exclude
     for (const file of allFiles) {
       if (regex.test(file)) {
         candidates.add(file);
+        matched = true;
       }
+    }
+
+    if (options.requireExplicitMatches === true && !matched && isExplicitInput(input)) {
+      throw new Error(`no files matched input: ${input}`);
     }
   }
 
@@ -113,6 +129,10 @@ async function isFile(filePath: string): Promise<boolean> {
 
 function normalizePath(filePath: string): string {
   return filePath.split(path.sep).join('/');
+}
+
+function isExplicitInput(input: string): boolean {
+  return !input.includes('*') && !input.includes('?');
 }
 
 function escapeRegExp(value: string): string {
