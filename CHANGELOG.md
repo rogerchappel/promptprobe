@@ -10,6 +10,13 @@ format and uses semantic versioning when versioned releases are published.
 ### Added
 
 - Initial project setup.
+- CLI `--version` support.
+- Package entrypoint verification in the release check.
+- Example instruction file for default rule expectations.
+
+### Changed
+
+- Explicit missing scan input files now fail fast instead of producing an empty successful scan.
 
 ## Release Links
 

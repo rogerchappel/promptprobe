@@ -14,7 +14,7 @@
     }
   },
   "files": [
-    "dist",
+    "dist/src",
     "examples",
     "README.md"
   ],

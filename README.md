@@ -23,9 +23,13 @@ promptprobe scan AGENTS.md docs/**/*.md
 promptprobe scan --format json --output promptprobe.json
 promptprobe rules
 promptprobe explain PP003
+promptprobe --version
 ```
 
 By default, `scan` exits `2` when findings at or above the configured `failOn` severity are present. The default threshold is `high`.
+When you pass explicit file paths, missing files are treated as errors so typos do not produce empty successful scans.
+
+See [examples/agent-instructions.md](examples/agent-instructions.md) for a minimal instruction file that should pass the default rules.
 
 ## Verify
 
@@ -36,6 +40,14 @@ bash scripts/validate.sh
 ```
 
 `scripts/validate.sh` runs the repository's standard local checks when they are defined and will also run `agent-qc ready` when `agent-qc` is installed. Missing `agent-qc` is treated as a skip, not a failure.
+
+For release readiness, run:
+
+```sh
+npm run release:check
+```
+
+`release:check` type-checks, runs tests, exercises the CLI smoke test, verifies package entrypoints, and performs an npm pack dry run.
 
 ## Contributing
 
