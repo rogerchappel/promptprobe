@@ -27,6 +27,11 @@ promptprobe explain PP003
 
 By default, `scan` exits `2` when findings at or above the configured `failOn` severity are present. The default threshold is `high`.
 
+## Demo Recipes
+
+- [Compare Agent Instruction Files](docs/tutorials/compare-agent-instructions.md) scans a risky example beside a safer baseline.
+- [Video brief](docs/promo/video-brief.md) gives a grounded short walkthrough for explaining the tool.
+
 ## Verify
 
 Run the local validation script before opening a pull request:
