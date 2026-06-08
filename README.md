@@ -57,3 +57,15 @@ These links assume this README has been copied to the generated repository root.
 ## License
 
 MIT
+
+## Development
+
+```sh
+git clone https://github.com/rogerchappel/promptprobe.git
+cd promptprobe
+npm install
+npm test
+npm run smoke
+npm run package:smoke
+npm run release:check
+```
