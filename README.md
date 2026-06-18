@@ -42,6 +42,20 @@ bash scripts/validate.sh
 
 `scripts/validate.sh` runs the repository's standard local checks when they are defined and will also run `agent-qc ready` when `agent-qc` is installed. Missing `agent-qc` is treated as a skip, not a failure.
 
+## Release readiness
+
+Before opening a release PR, run the package checks that exercise the build, tests, smoke path, and pack manifest:
+
+```sh
+npm run check
+npm test
+npm run smoke
+npm run package:smoke
+npm run release:check
+```
+
+The package metadata points at the public GitHub repository so npm and generated provenance link back to the source.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution expectations. Changes
