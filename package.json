@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "description": "Offline linter for agent instructions, system prompts, and repo guidance files.",
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/src/index.js",
   "bin": {
-    "promptprobe": "./dist/cli.js"
+    "promptprobe": "./dist/src/cli.js"
   },
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
     }
   },
   "files": [
@@ -28,8 +28,9 @@
     "pretest": "npm run build",
     "test": "node --test dist/tests/**/*.test.js",
     "smoke": "bash scripts/smoke.sh",
-    "package:smoke": "npm pack --dry-run",
-    "release:check": "npm run check && npm test && npm run smoke && npm run package:smoke"
+    "package:smoke": "npm run build && test -f ./dist/src/cli.js && test -f ./dist/src/index.js && npm pack --dry-run",
+    "release:check": "npm run check && npm test && npm run smoke && npm run package:smoke",
+    "prepack": "npm run build"
   },
   "keywords": [
     "agents",
