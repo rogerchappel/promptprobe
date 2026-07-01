@@ -10,6 +10,11 @@ format and uses semantic versioning when versioned releases are published.
 ### Added
 
 - Initial project setup.
+- Package smoke now verifies the dry-run pack manifest before release.
+
+### Changed
+
+- Exclude compiled test artifacts from the published package contents.
 
 ## Release Links
 
