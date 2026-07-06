@@ -27,6 +27,7 @@
   "scripts": {
     "build": "tsc",
     "check": "tsc --noEmit",
+    "lint": "npm run check",
     "pretest": "npm run build",
     "test": "node --test dist/tests/**/*.test.js",
     "smoke": "bash scripts/smoke.sh",
