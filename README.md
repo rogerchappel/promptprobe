@@ -99,3 +99,7 @@ npm run release:check
 
 The package smoke uses `npm pack --dry-run` so the published file list can be reviewed without publishing.
 It also verifies that required runtime files are present and compiled test artifacts are excluded from the package.
+
+## Limitations
+
+promptprobe is a local-first helper for preparing reviewable evidence. It does not replace human review, live system validation, or project-specific policy checks, and generated output should be inspected before use in release or operational decisions.
