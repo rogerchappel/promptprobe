@@ -3,14 +3,21 @@ import { access, readdir, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import type { ProbeDocument } from './types.js';
 
-export async function resolveInputFiles(cwd: string, patterns: string[], exclude: string[]): Promise<string[]> {
+export async function resolveInputFiles(
+  cwd: string,
+  patterns: string[],
+  exclude: string[],
+  requireMatches = false
+): Promise<string[]> {
   const candidates = new Set<string>();
   const allFiles = await listFiles(cwd);
   const excludeRegexes = exclude.map(globToRegExp);
+  const unmatched: string[] = [];
 
   for (const input of patterns) {
     const normalized = normalizePath(input);
     const absolute = path.resolve(cwd, input);
+    let matched = false;
 
     if (await isFile(absolute)) {
       candidates.add(normalizePath(path.relative(cwd, absolute)));
@@ -21,8 +28,15 @@ export async function resolveInputFiles(cwd: string, patterns: string[], exclude
     for (const file of allFiles) {
       if (regex.test(file)) {
         candidates.add(file);
+        matched = true;
       }
     }
+    if (!matched) unmatched.push(input);
+  }
+
+  if (requireMatches && unmatched.length > 0) {
+    const label = unmatched.length === 1 ? 'input did not match any files' : 'inputs did not match any files';
+    throw new Error(`${label}: ${unmatched.join(', ')}`);
   }
 
   return [...candidates]

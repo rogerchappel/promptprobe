@@ -28,4 +28,50 @@ describe('scan', () => {
     assert.deepEqual(result.files, ['docs/one.md', 'docs/two.md']);
     assert.equal(result.summary.findings, 0);
   });
+
+  it('rejects a missing explicit file', async () => {
+    const root = await mkdtemp(path.join(tmpdir(), 'promptprobe-'));
+
+    await assert.rejects(
+      scan({ cwd: root, inputs: ['typo.md'] }),
+      /input did not match any files: typo\.md/
+    );
+  });
+
+  it('rejects an unmatched explicit glob', async () => {
+    const root = await mkdtemp(path.join(tmpdir(), 'promptprobe-'));
+
+    await assert.rejects(
+      scan({ cwd: root, inputs: ['docs/**/*.md'] }),
+      /input did not match any files: docs\/\*\*\/\*\.md/
+    );
+  });
+
+  it('reports unmatched inputs even when another explicit input matches', async () => {
+    const root = await mkdtemp(path.join(tmpdir(), 'promptprobe-'));
+    await writeFile(path.join(root, 'AGENTS.md'), 'Private data stays private.\n');
+
+    await assert.rejects(
+      scan({ cwd: root, inputs: ['AGENTS.md', 'missing.md', 'notes/*.md'] }),
+      /inputs did not match any files: missing\.md, notes\/\*\.md/
+    );
+  });
+
+  it('allows configured globs to match no files', async () => {
+    const root = await mkdtemp(path.join(tmpdir(), 'promptprobe-'));
+
+    const result = await scan({ cwd: root, inputs: [], config: { files: ['docs/**/*.md'] } });
+
+    assert.deepEqual(result.files, []);
+    assert.equal(result.summary.filesScanned, 0);
+  });
+
+  it('allows built-in defaults to match no files', async () => {
+    const root = await mkdtemp(path.join(tmpdir(), 'promptprobe-'));
+
+    const result = await scan({ cwd: root, inputs: [] });
+
+    assert.deepEqual(result.files, []);
+    assert.equal(result.summary.filesScanned, 0);
+  });
 });

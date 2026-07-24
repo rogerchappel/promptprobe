@@ -27,6 +27,11 @@ promptprobe explain PP003
 
 By default, `scan` exits `2` when findings at or above the configured `failOn` severity are present. The default threshold is `high`.
 
+Every file or glob passed explicitly to `scan` must match at least one file. A typo such as
+`promptprobe scan missing.md` prints a diagnostic and exits `1`, including when other inputs
+match. Configured and built-in default globs may match no files; this lets `promptprobe scan`
+succeed in a new repository that does not yet contain supported instruction files.
+
 ## Demo Recipes
 
 - [Compare Agent Instruction Files](docs/tutorials/compare-agent-instructions.md) scans a risky example beside a safer baseline.

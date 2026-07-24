@@ -9,7 +9,7 @@ export async function scan(options: ScanOptions): Promise<ScanResult> {
     ...baseConfig,
     files: options.inputs.length > 0 ? options.inputs : baseConfig.files
   };
-  const files = await resolveInputFiles(options.cwd, config.files, config.exclude);
+  const files = await resolveInputFiles(options.cwd, config.files, config.exclude, options.inputs.length > 0);
   const ignored = new Set(config.ignoredRules.map((rule) => rule.toUpperCase()));
   const activeRules = rules.filter((rule) => !ignored.has(rule.id));
   const findings: RuleFinding[] = [];
