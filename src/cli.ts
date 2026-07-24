@@ -14,8 +14,10 @@ type Parsed = {
 };
 
 async function main(argv: string[]): Promise<number> {
-  const parsed = parse(argv);
   try {
+    const parsed = parse(argv);
+    validateOptions(parsed);
+
     if (parsed.command === 'init') {
       const destination = await writeDefaultConfig(process.cwd());
       process.stdout.write(`Created ${path.relative(process.cwd(), destination)}\n`);
@@ -54,6 +56,29 @@ async function main(argv: string[]): Promise<number> {
   } catch (error) {
     process.stderr.write(`promptprobe: ${error instanceof Error ? error.message : String(error)}\n`);
     return 1;
+  }
+}
+
+const commandOptions: Record<string, ReadonlySet<string>> = {
+  init: new Set(),
+  scan: new Set(['format', 'output', 'fail-on']),
+  rules: new Set(['format']),
+  explain: new Set()
+};
+
+const valueOptions = new Set(['format', 'output', 'fail-on']);
+
+function validateOptions(parsed: Parsed): void {
+  const supported = commandOptions[parsed.command];
+  if (!supported) return;
+
+  for (const [name, value] of parsed.options) {
+    if (!supported.has(name)) {
+      throw new Error(`unknown option for ${parsed.command}: --${name}`);
+    }
+    if (valueOptions.has(name) && (value === true || value === '')) {
+      throw new Error(`--${name} requires a value`);
+    }
   }
 }
 
