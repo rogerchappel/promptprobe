@@ -27,6 +27,10 @@ promptprobe explain PP003
 
 By default, `scan` exits `2` when findings at or above the configured `failOn` severity are present. The default threshold is `high`.
 
+Command options are validated strictly. Unknown options, options without a value, and extra
+arguments to `init`, `rules`, or `explain` print a diagnostic and exit `1`. Value options accept
+both `--format json` and `--format=json` forms.
+
 Every file or glob passed explicitly to `scan` must match at least one file. A typo such as
 `promptprobe scan missing.md` prints a diagnostic and exits `1`, including when other inputs
 match. Configured and built-in default globs may match no files; this lets `promptprobe scan`

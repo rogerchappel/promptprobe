@@ -14,8 +14,10 @@ type Parsed = {
 };
 
 async function main(argv: string[]): Promise<number> {
-  const parsed = parse(argv);
   try {
+    const parsed = parse(argv);
+    validateArguments(parsed);
+
     if (parsed.command === 'init') {
       const destination = await writeDefaultConfig(process.cwd());
       process.stdout.write(`Created ${path.relative(process.cwd(), destination)}\n`);
@@ -81,6 +83,30 @@ function parse(argv: string[]): Parsed {
   }
 
   return { command: command === '--help' || command === '-h' ? 'help' : command, args, options };
+}
+
+function validateArguments(parsed: Parsed): void {
+  const allowedOptions: Record<string, readonly string[]> = {
+    help: [],
+    init: [],
+    scan: ['format', 'output', 'fail-on'],
+    rules: ['format'],
+    explain: []
+  };
+  const allowed = allowedOptions[parsed.command];
+  if (!allowed) throw new Error(`unknown command: ${parsed.command}`);
+
+  for (const [name, value] of parsed.options) {
+    if (!allowed.includes(name)) throw new Error(`unknown option for ${parsed.command}: --${name}`);
+    if (value === true || value === '') throw new Error(`--${name} requires a value`);
+  }
+
+  if ((parsed.command === 'help' || parsed.command === 'init' || parsed.command === 'rules') && parsed.args.length > 0) {
+    throw new Error(`${parsed.command} does not accept positional arguments`);
+  }
+  if (parsed.command === 'explain' && parsed.args.length !== 1) {
+    throw new Error('explain requires exactly one rule id');
+  }
 }
 
 function stringOption(parsed: Parsed, name: string): string | undefined {
