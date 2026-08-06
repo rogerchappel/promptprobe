@@ -11,10 +11,8 @@ security posture before using it in production.
 
 ## Install
 
-```sh
-npm install
-npm run build
-```
+The package has not had its first npm release yet. Until `promptprobe` is available from npm,
+clone the repository and use the development setup below.
 
 ## Use
 
@@ -106,8 +104,8 @@ npm run package:smoke
 npm run release:check
 ```
 
-The package smoke uses `npm pack --dry-run` so the published file list can be reviewed without publishing.
-It also verifies that required runtime files are present and compiled test artifacts are excluded from the package.
+The package smoke creates the publish tarball, installs it into a clean temporary consumer without
+registry fallback, and invokes the installed `promptprobe` bin both directly and through `npx --no-install`.
 
 ## Limitations
 
