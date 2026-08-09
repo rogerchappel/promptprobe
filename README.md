@@ -34,6 +34,26 @@ Every file or glob passed explicitly to `scan` must match at least one file. A t
 match. Configured and built-in default globs may match no files; this lets `promptprobe scan`
 succeed in a new repository that does not yet contain supported instruction files.
 
+## Configuration
+
+Create `.promptprobe.json` in the directory where you run the command. Every field is optional;
+omitted fields use these defaults:
+
+```json
+{
+  "files": ["AGENTS.md", "CLAUDE.md", "README.md", "docs/**/*.md", "skills/**/*.md", "**/*.prompt.md", "**/*.instructions.md"],
+  "exclude": ["node_modules/**", "dist/**", "build/**", "coverage/**", ".git/**"],
+  "ignoredRules": [],
+  "failOn": "high",
+  "format": "text"
+}
+```
+
+`files`, `exclude`, and `ignoredRules` must be arrays of non-empty strings. `failOn` accepts
+`low`, `medium`, or `high`; `format` accepts `text`, `json`, or `markdown`. Unknown keys and
+invalid values print a field-specific diagnostic and exit `1`. An explicit `"files": []` means
+scan no files; it does not restore the default file globs.
+
 ## Demo Recipes
 
 - [Compare Agent Instruction Files](docs/tutorials/compare-agent-instructions.md) scans a risky example beside a safer baseline.
