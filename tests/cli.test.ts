@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
-import { mkdtemp } from 'node:fs/promises';
+import { mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
@@ -45,6 +45,33 @@ describe('cli scan inputs', () => {
     const result = JSON.parse(stdout) as { files: string[]; summary: { filesScanned: number } };
     assert.deepEqual(result.files, []);
     assert.equal(result.summary.filesScanned, 0);
+  });
+
+  it('honors an explicit empty files configuration', async () => {
+    const root = await mkdtemp(path.join(tmpdir(), 'promptprobe-cli-'));
+    await writeFile(path.join(root, '.promptprobe.json'), '{"files":[]}');
+    await writeFile(path.join(root, 'README.md'), '# Present but intentionally not scanned\n');
+
+    const { stdout, stderr } = await execFileAsync(process.execPath, [cli, 'scan', '--format', 'json'], { cwd: root });
+
+    assert.equal(stderr, '');
+    const result = JSON.parse(stdout) as { files: string[]; summary: { filesScanned: number } };
+    assert.deepEqual(result.files, []);
+    assert.equal(result.summary.filesScanned, 0);
+  });
+
+  it('prints a field-specific diagnostic and exits one for invalid configuration', async () => {
+    const root = await mkdtemp(path.join(tmpdir(), 'promptprobe-cli-'));
+    await writeFile(path.join(root, '.promptprobe.json'), '{"ignoredRules":[7]}');
+
+    await assert.rejects(
+      execFileAsync(process.execPath, [cli, 'scan'], { cwd: root }),
+      (error: Error & { code?: number; stderr?: string }) => {
+        assert.equal(error.code, 1);
+        assert.match(error.stderr ?? '', /promptprobe: ignoredRules\[0\] must be a non-empty string/);
+        return true;
+      }
+    );
   });
 });
 

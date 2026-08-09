@@ -27,7 +27,8 @@ export async function loadConfig(cwd: string): Promise<PromptProbeConfig> {
     return { ...defaultConfig };
   }
 
-  const parsed = JSON.parse(await readFile(configPath, 'utf8')) as Partial<PromptProbeConfig>;
+  const parsed: unknown = JSON.parse(await readFile(configPath, 'utf8'));
+  validateConfig(parsed);
   return normalizeConfig(parsed);
 }
 
@@ -52,8 +53,37 @@ function stringArray(value: unknown, fallback: string[]): string[] {
     return [...fallback];
   }
 
-  const filtered = value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0);
-  return filtered.length > 0 || fallback.length === 0 ? filtered : [...fallback];
+  return value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0);
+}
+
+function validateConfig(value: unknown): asserts value is Partial<PromptProbeConfig> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    throw new Error('configuration must be a JSON object');
+  }
+
+  const config = value as Record<string, unknown>;
+  const allowedKeys = new Set(['files', 'exclude', 'ignoredRules', 'failOn', 'format']);
+  for (const key of Object.keys(config)) {
+    if (!allowedKeys.has(key)) throw new Error(`unknown configuration key: ${key}`);
+  }
+
+  for (const field of ['files', 'exclude', 'ignoredRules'] as const) {
+    const fieldValue = config[field];
+    if (fieldValue === undefined) continue;
+    if (!Array.isArray(fieldValue)) throw new Error(`${field} must be an array of non-empty strings`);
+    fieldValue.forEach((item, index) => {
+      if (typeof item !== 'string' || item.trim().length === 0) {
+        throw new Error(`${field}[${index}] must be a non-empty string`);
+      }
+    });
+  }
+
+  if (config.failOn !== undefined && config.failOn !== 'low' && config.failOn !== 'medium' && config.failOn !== 'high') {
+    throw new Error('failOn must be low, medium, or high');
+  }
+  if (config.format !== undefined && config.format !== 'text' && config.format !== 'json' && config.format !== 'markdown') {
+    throw new Error('format must be text, json, or markdown');
+  }
 }
 
 function severity(value: unknown, fallback: Severity): Severity {
