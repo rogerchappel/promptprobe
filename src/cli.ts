@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { defaultConfig, loadConfig, writeDefaultConfig } from './config.js';
 import { formatRules, formatScanResult } from './formatters.js';
@@ -44,6 +44,7 @@ async function main(argv: string[]): Promise<number> {
       const rendered = formatScanResult(result, format);
       const output = stringOption(parsed, 'output');
       if (output) {
+        await mkdir(path.dirname(path.resolve(output)), { recursive: true });
         await writeFile(output, rendered, 'utf8');
       } else {
         process.stdout.write(rendered);
