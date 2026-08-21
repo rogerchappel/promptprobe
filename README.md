@@ -24,6 +24,8 @@ promptprobe explain PP003
 ```
 
 By default, `scan` exits `2` when findings at or above the configured `failOn` severity are present. The default threshold is `high`.
+When `--output` names a path in missing directories, `promptprobe` creates those parent directories
+before writing the report. Output is not also printed to stdout, and finding-threshold exit codes are unchanged.
 
 Command options are validated strictly. Unknown options, options without a value, and extra
 arguments to `init`, `rules`, or `explain` print a diagnostic and exit `1`. Value options accept
