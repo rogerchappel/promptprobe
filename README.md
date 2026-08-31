@@ -17,11 +17,14 @@ clone the repository and use the development setup below.
 ## Use
 
 ```sh
-promptprobe scan AGENTS.md docs/**/*.md
-promptprobe scan --format json --output promptprobe.json
-promptprobe rules
-promptprobe explain PP003
+node dist/src/cli.js scan AGENTS.md docs/**/*.md
+node dist/src/cli.js scan --format json --output promptprobe.json
+node dist/src/cli.js rules
+node dist/src/cli.js explain PP003
 ```
+
+After the first npm publication and a global install, replace `node dist/src/cli.js` with
+`promptprobe` in the commands above.
 
 By default, `scan` exits `2` when findings at or above the configured `failOn` severity are present. The default threshold is `high`.
 When `--output` names a path in missing directories, `promptprobe` creates those parent directories
@@ -106,7 +109,8 @@ MIT
 ```sh
 git clone https://github.com/rogerchappel/promptprobe.git
 cd promptprobe
-npm install
+npm ci
+npm run build
 npm test
 npm run smoke
 npm run package:smoke
