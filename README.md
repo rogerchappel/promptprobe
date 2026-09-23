@@ -136,3 +136,7 @@ registry fallback, and invokes the installed `promptprobe` bin both directly and
 ## Limitations
 
 promptprobe is a local-first helper for preparing reviewable evidence. It does not replace human review, live system validation, or project-specific policy checks, and generated output should be inspected before use in release or operational decisions.
+
+
+<!-- Automated change by spark worker -->
+This change was automatically processed by oss-pipeline-worker-spark-a
